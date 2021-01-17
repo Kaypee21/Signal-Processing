@@ -1,0 +1,35 @@
+%Simple Signal Compression 
+
+f = 1;
+fs = 44100;
+t = (1:1/fs:2);
+signal = sin(2*pi*f*t);
+N = length(signal)
+
+
+dt = 1/fs;
+    t = 0:dt:(length(signal)*dt)-dt;
+    plot(t,signal); xlabel('Seconds'); ylabel('Amplitude');
+    title ('Uncompressed Signal');
+    figure
+    envelope(signal, 5, 'rms');
+    title('Uncompressed Envelope');
+    figure
+    
+drc = compressor (-80, 5, 'SampleRate', fs,'AttackTime',0.01,'ReleaseTime',0.2,'MakeUpGainMode','Property')
+comp_signal = drc(signal)
+   % comp_signal = comp_signal(:,1);
+
+    dt = 1/fs;
+    t = 0:dt:(length(comp_signal)*dt)-dt;
+    plot(t,comp_signal); xlabel('Seconds'); ylabel('Amplitude');
+    title('Compressed Signal');
+    figure
+    %plot(psd(spectrum.periodogram,comp_signal,'Fs',fs,'NFFT',length(comp_signal)));
+    
+    envelope(comp_signal, 5, 'rms');
+    title('Compressed Envelope');
+
+
+sound(comp_signal,fs)
+
