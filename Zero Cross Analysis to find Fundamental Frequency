@@ -1,0 +1,73 @@
+%Zero Cross Analysis
+[x,fs] = audioread('...PianoC4.wav');
+
+%Fundamental frequency estimate through autocorrelating function
+
+i = 1;
+j = 0;
+while i < length(x);
+slope1 = (x(i+1)-x(i))/2;
+slope2 = (x(i+2)-x(i+1))/2;
+    if slope1*slope2<0;
+        j = j+1;
+  
+        if max(abs(x(i)))<0.01;
+            j = j-1;
+        end
+    end
+    i = i+1;
+end
+fund_frequency_acf = fs/j;
+
+
+
+%ZERO CROSSING ANALYSIS
+
+ZCR=(mean(abs(diff(sign(x)))));
+fund_frequency_zcr = fs*ZCR/2;
+
+%INVERSE COMB FILTER
+[x,fs] = audioread('G:\COURSES\DIGITAL SIGNAL PROCESSING 2\Archives\PianoC4.wav');
+
+%preemphasis filter
+hpf = (highpass(x,400,fs));
+g =0.5;
+
+
+
+%inverse comb filter
+
+Delayline=zeros(10,1); % memory allocation for length 10
+for i=1:length(hpf);
+ybuffer(i)=hpf(i)+g*Delayline(10);
+Delayline=[ybuffer(i);Delayline(1:10-1)];
+end;
+
+fund_frequency_icr = max(abs(Delayline));
+
+%HARMONIC PRODUCT SPECTRUM
+x_fft = abs(fft(x));
+y1 = abs(downsample(x_fft,2));
+y2 = abs(downsample(x_fft,3));
+y3 = abs(downsample(x_fft,4));
+
+buffer = zeros(1, length(y1));
+for i = 1:length(y1);
+    buffer(i)= y2(i);
+    y2_mod(i) = buffer(i);
+end
+for i = 1:length(y1);
+    buffer(i)= y3(i);
+    y3_mod(i) = buffer(i);
+end
+
+
+
+
+%CEPSTRUM
+
+x_fft = abs(fft(x));
+x_log = 20*log(x_fft);
+x_ifft = ifft(x_log);
+[f,g] = max(x_ifft);
+fund_frequency_cep = round(g);
