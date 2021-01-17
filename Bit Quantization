@@ -1,0 +1,14 @@
+%Bit Quantization
+f = 10;
+fs = 44100;
+t = (1:1/fs:2);
+input_signal = sin(2*pi*f*t);
+%plot(t,input_signal);
+prompt = 'Give a bit value'%s;
+nBits = input(prompt);
+output = quantizer(input_signal, nBits);
+plot(t,output);
+function quantized_signal = quantizer(x, n);
+
+quantized_signal = ceil(n*x)*(1/n);
+end
