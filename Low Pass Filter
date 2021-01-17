@@ -1,0 +1,32 @@
+f = 1000;
+fs = 44100;
+t = (1:1/fs:2);
+input_signal = sin(2*pi*f*t);
+N = length(input_signal);
+
+[b,a] = butter(8, 0.5);
+initial_cond1 = zeros(1, length(a)-1);
+
+OnePiece = filter(b, a, input_signal, initial_cond1); 
+
+sound(OnePiece, fs);
+
+yBuffer = zeros(1,N+1); 
+ for i = 1:200      % filter signal 
+     y(i) = input_signal(i) + 0.5*(yBuffer(N) + yBuffer(N+1));  
+     
+   
+     
+          
+     yBuffer(1) = y(i);   
+     for j = (length(yBuffer)-1):-1:1         
+         yBuffer(j+1) = yBuffer(j);
+     end     
+     yBuffer(1) = y(i);
+ end
+
+
+
+plot(y);
+audiowrite('blip.wav',y,fs);
+
